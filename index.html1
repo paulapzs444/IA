@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Científica</title>
+<style>
+/* Estilo general */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    height: 100vh;
+    background-color: #e0f7fa; /* Azul claro */
+    margin: 0;
+    transition: background-color 0.3s;
+}
+
+/* Contenedor principal */
+.container {
+    display: flex;
+    align-items: stretch; /* Alinea elementos verticalmente */
+    gap: 15px; /* Espacio entre la calculadora y el panel lateral */
+    width: auto; /* Ancho automático */
+    max-width: 600px; /* Ancho máximo ajustado */
+    margin: 0 auto; /* Centrado horizontal */
+}
+
+/* Estilo de la calculadora */
+.calculator {
+    background-color: #ffffff; /* Blanco */
+    padding: 15px; /* Padding reducido */
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    width: 320px; /* Ancho fijo de la calculadora */
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Pantalla de la calculadora */
+.display {
+    width: 100%;
+    height: 60px; /* Altura ajustada */
+    font-size: 28px; /* Tamaño de fuente aumentado */
+    text-align: right;
+    margin-bottom: 10px; /* Margen reducido */
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: #b2ebf2; /* Azul claro */
+    color: #00796b; /* Verde oscuro */
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Botones */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas */
+    gap: 8px; /* Espaciado reducido */
+}
+
+.button {
+    width: 100%;
+    height: 50px; /* Altura ligeramente mayor para mejor simetría */
+    font-size: 18px; /* Tamaño de fuente aumentado */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, color 0.3s;
+    font-weight: bold;
+    outline: none; /* Elimina el contorno predeterminado */
+}
+
+.button:hover {
+    transform: scale(1.05);
+}
+
+.button:active {
+    transform: scale(0.95); /* Aplastar ligeramente al presionar */
+    box-shadow: 0px 0px 10px rgba(0, 188, 212, 0.8); /* Brillo al presionar */
+}
+
+/* Colores diferenciados para los botones - Gama azul */
+.button.number {
+    background-color: #bbdefb; /* Azul muy claro */
+    color: #0d47a1; /* Azul oscuro */
+}
+
+.button.operator {
+    background-color: #64b5f6; /* Azul medio */
+    color: white;
+}
+
+.button.clear {
+    background-color: #1976d2; /* Azul más oscuro */
+    color: white;
+    grid-row: span 2; /* Ocupa dos filas */
+    height: auto; /* Ajusta automáticamente la altura */
+}
+
+.button.equal,
+.button.answer {
+    background-color: #0288d1; /* Azul oscuro */
+    color: white;
+    grid-column: span 2; /* Ocupa dos columnas */
+}
+
+.button.scientific {
+    background-color: #4fc3f7; /* Azul turquesa claro */
+    color: white;
+}
+
+/* Panel lateral con el texto */
+.side-panel {
+    background-color: #b2ebf2; /* Azul claro */
+    width: 120px; /* Ancho del panel */
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuye espacio entre nombre e historial */
+    align-items: center; /* Centra el contenido horizontalmente */
+    padding: 15px; /* Padding reducido */
+    box-sizing: border-box; /* Incluye el padding en el ancho total */
+    height: 100%; /* Ocupa toda la altura disponible */
+}
+
+/* Estilo del texto en el panel lateral */
+.side-panel p {
+    font-size: 16px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+    color: #00796b; /* Verde oscuro */
+    text-align: center; /* Alineación centrada */
+    line-height: 1.4; /* Espaciado entre líneas */
+    margin-top: 0; /* Elimina margen superior */
+    margin-bottom: 15px; /* Espacio debajo del nombre */
+}
+
+/* Historial */
+.history {
+    width: 100%;
+    max-height: 200px; /* Altura máxima del historial */
+    overflow-y: auto; /* Barra de desplazamiento vertical si es necesario */
+    font-size: 12px; /* Tamaño de fuente reducido */
+    color: #00796b; /* Verde oscuro */
+    text-align: left; /* Alineación izquierda */
+    padding-right: 5px; /* Espacio para evitar recortes */
+}
+
+.history-entry {
+    margin-bottom: 5px; /* Espaciado entre entradas */
+}
+</style>
+</head>
+<body>
+<div class="container">
+<!-- Calculadora -->
+<div class="calculator" id="calculator">
+<!-- Pantalla de la calculadora -->
+<input type="text" class="display" id="display" disabled>
+<!-- Botones -->
+<div class="buttons">
+    <!-- Fila 1: Funciones científicas -->
+    <button class="button scientific" onclick="scientificFunction('sqrt')" aria-label="Raíz cuadrada">√</button>
+    <button class="button scientific" onclick="scientificFunction('pow')" aria-label="Potencia">x²</button>
+    <button class="button scientific" onclick="scientificFunction('sin')" aria-label="Seno">sin</button>
+    <button class="button scientific" onclick="scientificFunction('cos')" aria-label="Coseno">cos</button>
+    <!-- Fila 2: Funciones científicas -->
+    <button class="button scientific" onclick="scientificFunction('tan')" aria-label="Tangente">tan</button>
+    <button class="button operator" onclick="appendOperator('^')" aria-label="Exponente">^</button>
+    <button class="button operator" onclick="appendOperator('/')" aria-label="Dividir">÷</button>
+    <button class="button operator" onclick="appendOperator('*')" aria-label="Multiplicar">×</button>
+    <!-- Fila 3: Números y operador -->
+    <button class="button number" onclick="appendNumber('7')" aria-label="7">7</button>
+    <button class="button number" onclick="appendNumber('8')" aria-label="8">8</button>
+    <button class="button number" onclick="appendNumber('9')" aria-label="9">9</button>
+    <button class="button operator" onclick="appendOperator('-')" aria-label="Restar">−</button>
+    <!-- Fila 4: Números y operador -->
+    <button class="button number" onclick="appendNumber('4')" aria-label="4">4</button>
+    <button class="button number" onclick="appendNumber('5')" aria-label="5">5</button>
+    <button class="button number" onclick="appendNumber('6')" aria-label="6">6</button>
+    <button class="button operator" onclick="appendOperator('+')" aria-label="Sumar">+</button>
+    <!-- Fila 5: Números y limpiar -->
+    <button class="button number" onclick="appendNumber('1')" aria-label="1">1</button>
+    <button class="button number" onclick="appendNumber('2')" aria-label="2">2</button>
+    <button class="button number" onclick="appendNumber('3')" aria-label="3">3</button>
+    <button class="button clear" onclick="clearDisplay()" aria-label="Limpiar">C</button>
+    <!-- Fila 6: Número 0 y punto -->
+    <button class="button number" onclick="appendNumber('0')" style="grid-column: span 2;" aria-label="0">0</button>
+    <button class="button number" onclick="appendNumber('.')" aria-label="Punto">.</button>
+    <!-- Fila 7: Igual y ANS -->
+    <button class="button equal" onclick="calculateResult()" aria-label="Igual">=</button>
+    <button class="button answer" onclick="useAnswer()" aria-label="Usar respuesta anterior">ANS</button>
+</div>
+</div>
+
+<!-- Panel lateral con el nombre y el historial -->
+<div class="side-panel" id="sidePanel">
+    <p>Paula Pazos Sanmartín</p>
+    <div class="history" id="history"></div>
+</div>
+</div>
+
+<script>
+let isOn = false;
+let historyLog = []; // Array para almacenar el historial de cálculos
+let lastAnswer = ""; // Variable para almacenar la última respuesta
+
+const colors = [
+    { 
+        calculator: "#FF4444", // Rojo
+        buttons: "#FF8A80",   // Rosado claro
+        display: "#FFEBEE",   // Rosado muy claro
+        numberText: "#FFFFFF", // Texto blanco
+        screenBackground: "#FFEBEE", // Fondo de pantalla rosado claro
+        sidePanel: "#FFEBEE" // Fondo del panel lateral
+    },
+    { 
+        calculator: "#FFEB3B", // Amarillo
+        buttons: "#FFF9C4",   // Beige claro
+        display: "#FFFDE7",   // Beige muy claro
+        numberText: "#000000", // Texto negro
+        screenBackground: "#FFFDE7", // Fondo de pantalla beige claro
+        sidePanel: "#FFFDE7" // Fondo del panel lateral
+    },
+    { 
+        calculator: "#4CAF50", // Verde
+        buttons: "#C8E6C9",   // Verde claro
+        display: "#E8F5E9",   // Verde muy claro
+        numberText: "#000000", // Texto negro
+        screenBackground: "#E8F5E9", // Fondo de pantalla verde claro
+        sidePanel: "#E8F5E9" // Fondo del panel lateral
+    },
+    { 
+        calculator: "#9C27B0", // Morado
+        buttons: "#E1BEE7",   // Morado claro
+        display: "#F3E5F5",   // Morado muy claro
+        numberText: "#FFFFFF", // Texto blanco
+        screenBackground: "#F3E5F5", // Fondo de pantalla morado claro
+        sidePanel: "#F3E5F5" // Fondo del panel lateral
+    }
+];
+let colorIndex = 0; // Índice para cambiar de color
+
+// Función para agregar números al display
+function appendNumber(number) {
+    if (!isOn) turnOn();
+    const display = document.getElementById('display');
+    if (display.value === "Error") display.value = "";
+    display.value += number;
+}
+
+// Función para agregar operadores al display
+function appendOperator(operator) {
+    if (!isOn) turnOn();
+    const display = document.getElementById('display');
+    const lastChar = display.value.slice(-1);
+    if (['+', '-', '*', '/', '^'].includes(lastChar)) {
+        display.value = display.value.slice(0, -1); // Reemplazar el último operador
+    }
+    display.value += operator;
+}
+
+// Función para calcular el resultado
+function calculateResult() {
+    if (!isOn) turnOn();
+    const display = document.getElementById('display');
+    try {
+        let expression = display.value.replace(/\^/g, '**');
+        let result = eval(expression); // Evalúa la expresión matemática
+        display.value = result;
+
+        // Guardar la operación en el historial
+        historyLog.push(`${expression} = ${result}`);
+        updateHistory();
+
+        // Almacenar la última respuesta
+        lastAnswer = result.toString();
+
+        // Cambiar el color de la calculadora, botones, display y fondo de pantalla
+        changeCalculatorColor();
+    } catch (error) {
+        display.value = "Error"; // Manejo de errores
+    }
+}
+
+// Función para usar la última respuesta
+function useAnswer() {
+    if (!isOn) turnOn();
+    const display = document.getElementById('display');
+    if (lastAnswer !== "") {
+        display.value += lastAnswer;
+    }
+}
+
+// Función para actualizar el historial en el panel lateral
+function updateHistory() {
+    const historyElement = document.getElementById('history');
+    historyElement.innerHTML = ''; // Limpiar el historial actual
+    historyLog.forEach(entry => {
+        const entryElement = document.createElement('div');
+        entryElement.className = 'history-entry';
+        entryElement.textContent = entry;
+        historyElement.appendChild(entryElement);
+    });
+}
+
+// Función para cambiar el color de la calculadora, botones, display y fondo de pantalla
+function changeCalculatorColor() {
+    const calculator = document.getElementById('calculator');
+    const display = document.getElementById('display');
+    const buttons = document.querySelectorAll('.button');
+    const body = document.body;
+    const sidePanel = document.getElementById('sidePanel');
+    // Aplicar los nuevos colores
+    calculator.style.backgroundColor = colors[colorIndex].calculator;
+    display.style.backgroundColor = colors[colorIndex].display;
+    display.style.color = colors[colorIndex].numberText; // Color del texto del display
+    body.style.backgroundColor = colors[colorIndex].screenBackground; // Fondo de pantalla
+    sidePanel.style.backgroundColor = colors[colorIndex].sidePanel; // Fondo del panel lateral
+    buttons.forEach(button => {
+        button.style.backgroundColor = colors[colorIndex].buttons;
+        button.style.color = colors[colorIndex].numberText; // Color del texto de los botones
+    });
+    // Cambiar al siguiente conjunto de colores
+    colorIndex = (colorIndex + 1) % colors.length;
+}
+
+// Función para limpiar el display
+function clearDisplay() {
+    document.getElementById('display').value = "";
+    turnOff();
+}
+
+// Función para realizar cálculos científicos
+function scientificFunction(func) {
+    if (!isOn) turnOn();
+    const display = document.getElementById('display');
+    let value = parseFloat(display.value);
+    if (isNaN(value)) {
+        display.value = "Error";
+        return;
+    }
+    switch (func) {
+        case 'sqrt':
+            display.value = Math.sqrt(value).toFixed(4); // Raíz cuadrada
+            break;
+        case 'pow':
+            display.value = Math.pow(value, 2).toFixed(4); // Potencia al cuadrado
+            break;
+        case 'sin':
+            display.value = (Math.sin((value * Math.PI) / 180)).toFixed(4); // Seno
+            break;
+        case 'cos':
+            display.value = (Math.cos((value * Math.PI) / 180)).toFixed(4); // Coseno
+            break;
+        case 'tan':
+            display.value = (Math.tan((value * Math.PI) / 180)).toFixed(4); // Tangente
+            break;
+    }
+}
+
+// Función para encender el LED
+function turnOn() {
+    isOn = true;
+}
+
+// Función para apagar el LED
+function turnOff() {
+    isOn = false;
+}
+
+// Soporte para teclado físico
+document.addEventListener('keydown', (event) => {
+    const key = event.key;
+    if (/[0-9]/.test(key)) {
+        appendNumber(key);
+    } else if (['+', '-', '*', '/', '.', '^'].includes(key)) {
+        appendOperator(key);
+    } else if (key === 'Enter') {
+        calculateResult();
+    } else if (key === 'Backspace') {
+        clearDisplay();
+    }
+});
+</script>
+</body>
+</html>
